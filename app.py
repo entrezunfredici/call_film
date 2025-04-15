@@ -31,6 +31,16 @@ def get_now_playing_movies():
     else:
         return {"results": []}
 
+    try:
+        response = requests.get(endpoint, params=params, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        save_to_cache(cache_file, data)
+        return data
+    except requests.RequestException:
+        cached = load_from_cache(cache_file)
+        return cached if cached else {"results": []}
+
 def get_popular_movies():
     """Récupère les films les plus populaires"""
     endpoint = f"{TMDB_API_URL}/movie/popular"
@@ -79,6 +89,44 @@ def get_movie_genres():
     else:
         return []
 
+def get_top_rated_tv_shows():
+    """
+    Récupère les séries TV les mieux notées depuis l'API TMDB
+    """
+    endpoint = f"{TMDB_API_URL}/tv/popular"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "language": "fr-FR"
+    }
+    params = {
+        "api_key": TMDB_API_KEY,
+        "language": "fr-FR",
+        "page": 1
+    }
+    
+    response = requests.get(endpoint, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"results": []}
+
+def get_tv_genres():
+    """
+    Récupère les genres de séries TV depuis l'API TMDB
+    """
+    endpoint = f"{TMDB_API_URL}/genre/tv/list"
+    params = {
+        "api_key": os.environ.get("TMDB_API_KEY"),
+        "language": "fr-FR"
+    }
+    response = requests.get(endpoint, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"results": []}
+
 def format_movies(movies):
     """Formate les données des films pour l'affichage"""
     for movie in movies:
@@ -87,6 +135,27 @@ def format_movies(movies):
         else:
             movie["poster_url"] = "/static/no-poster.jpg"
     return movies
+
+def format_tv_shows(tv_shows):
+    """
+    Formate les données des séries TV pour l'affichage
+    """
+    for show in tv_shows:
+        # Gérer le cas où il n'y a pas d'image
+        if show.get('poster_path'):
+            show['poster_url'] = f"{POSTER_BASE_URL}{show['poster_path']}"
+        else:
+            show['poster_url'] = url_for('/static/no-poster.jpg')
+        
+        # Remplacer le champ 'title' par 'name' pour les séries TV
+        if 'name' in show and 'title' not in show:
+            show['title'] = show['name']
+            
+        # Gérer le champ 'first_air_date' au lieu de 'release_date'
+        if 'first_air_date' in show and 'release_date' not in show:
+            show['release_date'] = show['first_air_date']
+    
+    return tv_shows
 
 @app.route('/')
 def home():
@@ -175,6 +244,36 @@ def search():
                           selected_genre=genre_id, 
                           query=query,
                           active_page="search")
+
+# Remplacez la route '/popular' par '/top-rated-tv'
+@app.route('/top-rated-tv')
+def top_rated_tv():
+    """
+    Affiche les séries TV les mieux notées
+    """
+    # Récupérer le paramètre de genre s'il existe
+    genre_filter = request.args.get('genre')
+    
+    # Récupérer les séries TV les mieux notées
+    tv_data = get_top_rated_tv_shows()
+    tv_shows = tv_data.get('results', [])
+    
+    # Récupérer les genres pour l'affichage
+    genres = get_tv_genres()
+    
+    # Formater les séries TV pour l'affichage
+    formatted_tv_shows = format_tv_shows(tv_shows)
+    
+    # Filtrer par genre si nécessaire
+    if genre_filter:
+        formatted_tv_shows = [show for show in formatted_tv_shows 
+                           if int(genre_filter) in show.get('genre_ids', [])]
+    
+    return render_template('tv_shows.html', 
+                          tv_shows=formatted_tv_shows, 
+                          genres=genres,
+                          title="Séries TV les mieux notées", 
+                          genre_filter=genre_filter)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

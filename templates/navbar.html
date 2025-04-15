@@ -6,6 +6,7 @@
         <div class="nav-links">
             <a href="{{ url_for('now_playing') }}" class="nav-link {% if active_page == 'now-playing' %}active{% endif %}">Films en salle</a>
             <a href="{{ url_for('popular') }}" class="nav-link {% if active_page == 'popular' %}active{% endif %}">Films populaires</a>
+            <a href="{{ url_for('top_rated_tv') }}" class="nav-link {% if active_page == 'top_rated_tv' %}active{% endif %}">series les plus populaires</a>
         </div>
         
         <form action="{{ url_for('search') }}" method="get" class="search-form">

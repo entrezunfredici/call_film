@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+        
+        <header class="page-header">
+            <h1>{{ title }}</h1>
+            <div class="filter-container">
+                <form action="{{ request.path }}" method="get" id="genre-form">
+                    {% if query is defined and query %}
+                    <input type="hidden" name="query" value="{{ query }}">
+                    {% endif %}
+                    
+                    <label for="genre">Filtrer par genre:</label>
+                    <select name="genre" id="genre" onchange="this.form.submit()">
+                        <option value="">Tous les genres</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre.id }}" {% if selected_genre == genre.id %}selected{% endif %}>
+                            {{ genre.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </header>
+        <main>
+            <section class="filter-section">
+                <h2>Filtrer par genre</h2>
+                <div class="genre-filters">
+                    <a href="{{ url_for('top_rated_tv') }}" class="genre-btn {% if not genre_filter %}active{% endif %}">Tous</a>
+                    {% for genre in genres %}
+                    <a href="{{ url_for('top_rated_tv', genre=genre.id) }}" class="genre-btn {% if genre_filter|int == genre.id %}active{% endif %}">{{ genre.name }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+            
+            <section class="movies-grid">
+                {% for show in tv_shows %}
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="{{ show.poster_url }}" alt="{{ show.title }}">
+                    </div>
+                    <div class="movie-info">
+                        <h3>{{ show.title }}</h3>
+                        <p class="release-date">Date: {{ show.release_date }}</p>
+                        <p class="rating">Note: {{ show.vote_average|round(1) }}/10</p>
+                        <div class="overview">
+                            <p>{{ show.overview }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-results">
+                    <p>Aucune série TV trouvée.</p>
+                </div>
+                {% endfor %}
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2025 Cinéma Explorer - Propulsé par TMDB</p>
+        </footer>
+    </body>
+</html>

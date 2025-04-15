@@ -3,3 +3,6 @@ flask==2.3.3
 requests==2.31.0
 python-dotenv==1.0.0
 flask-wtf==1.1.1
+# Packages de test
+pytest==7.4.0
+behave==1.2.6

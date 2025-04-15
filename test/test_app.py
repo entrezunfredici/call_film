@@ -148,5 +148,58 @@ class FlaskMovieAppTests(unittest.TestCase):
             self.assertIn(b'Action Movie', response.data)
             self.assertNotIn(b'Comedy Movie', response.data)
 
+def test_top_rated_tv_page(self, mock_genres, mock_top_rated_tv):
+    # Mock des données
+    mock_top_rated_tv.return_value = {"results": [
+        {"id": 2, "name": "Top Rated TV Show", "first_air_date": "2025-04-01", "vote_average": 9.8, 
+         "overview": "A top rated TV show", "poster_path": "/toprated.jpg", "genre_ids": [18]}
+    ]}
+    mock_genres.return_value = [
+        {"id": 18, "name": "Drame"}
+    ]
+    
+    response = self.app.get('/top-rated-tv')
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(b'S\xc3\xa9ries TV les mieux not\xc3\xa9es', response.data)
+    self.assertIn(b'Top Rated TV Show', response.data)
+
+@patch('requests.get')
+def test_get_top_rated_tv_shows(self, mock_get):
+    # Mock de la réponse de l'API
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"results": [{"name": "Top Rated TV Show"}]}
+    mock_get.return_value = mock_response
+    
+    result = get_top_rated_tv_shows()
+    self.assertEqual(result, {"results": [{"name": "Top Rated TV Show"}]})
+
+@patch('requests.get')
+def test_get_tv_genres(self, mock_get):
+    # Mock de la réponse de l'API
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"genres": [{"id": 18, "name": "Drame"}]}
+    mock_get.return_value = mock_response
+    
+    result = get_tv_genres()
+    self.assertEqual(result, [{"id": 18, "name": "Drame"}])
+
+def test_format_tv_shows(self):
+    tv_shows = [
+        {"name": "Show 1", "poster_path": "/poster1.jpg", "first_air_date": "2025-04-01"},
+        {"name": "Show 2", "poster_path": None, "first_air_date": "2025-04-02"}
+    ]
+    
+    formatted_shows = format_tv_shows(tv_shows)
+    
+    # Vérifier que les URL d'image sont correctes
+    self.assertEqual(formatted_shows[0]["poster_url"], "https://image.tmdb.org/t/p/w500/poster1.jpg")
+    self.assertEqual(formatted_shows[1]["poster_url"], "/static/no-poster.jpg")
+    
+    # Vérifier que les champs title et release_date ont été ajoutés
+    self.assertEqual(formatted_shows[0]["title"], "Show 1")
+    self.assertEqual(formatted_shows[0]["release_date"], "2025-04-01")
+
 if __name__ == '__main__':
     unittest.main()
