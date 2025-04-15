@@ -2,8 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
-from app.controllers.movie_controller import movie_bp
-from app.controllers.tv_controller import tv_bp
+from app.domain.movie_controller import movie_bp
+from app.domain.tv_controller import tv_bp
 
 
 db = SQLAlchemy()
