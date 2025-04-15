@@ -1,3 +1,13 @@
+#mvc avec stockage (pas fini)
+# from app import create_app
+
+# app = create_app()
+
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', debug=True)
+
+
+# ancienne architecture (bordélique mais ok)
 # app.py
 from flask import Flask, render_template, request, redirect, url_for
 import requests
@@ -9,6 +19,11 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'une_clé_secrète_par_défaut')
+
+db_user = os.getenv("POSTGRES_USER")
+db_password = os.getenv("POSTGRES_PASSWORD")
+db_name = os.getenv("POSTGRES_DB")
+db_host = "db"  # nom du service Docker
 
 # Configuration de l'API TMDB
 TMDB_API_KEY = os.getenv('API_KEY')

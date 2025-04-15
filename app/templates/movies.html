@@ -1,0 +1,58 @@
+<!-- templates/movies.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <header class="page-header">
+        <h1>{{ title }}</h1>
+        <div class="filter-container">
+            <form action="{{ request.path }}" method="get" id="genre-form">
+                {% if query is defined and query %}
+                <input type="hidden" name="query" value="{{ query }}">
+                {% endif %}
+                
+                <label for="genre">Filtrer par genre:</label>
+                <select name="genre" id="genre" onchange="this.form.submit()">
+                    <option value="">Tous les genres</option>
+                    {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if selected_genre == genre.id %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </header>
+    
+    <main class="movie-grid">
+        {% if movies %}
+            {% for movie in movies %}
+            <div class="movie-card">
+                <div class="movie-poster">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
+                </div>
+                <div class="movie-info">
+                    <h2>{{ movie.title }}</h2>
+                    <p class="release-date">Date de sortie: {{ movie.release_date }}</p>
+                    <p class="rating">Note: {{ movie.vote_average }}/10</p>
+                    <p class="overview">{{ movie.overview|truncate(150) }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">Aucun film trouvé.</p>
+        {% endif %}
+    </main>
+    
+    <footer>
+        <p>Données fournies par TMDB</p>
+    </footer>
+</body>
+</html>
