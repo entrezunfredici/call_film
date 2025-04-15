@@ -1,0 +1,16 @@
+<!-- templates/navbar.html -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{{ url_for('home') }}" class="logo">Cinéma Explorer</a>
+        
+        <div class="nav-links">
+            <a href="{{ url_for('now_playing') }}" class="nav-link {% if active_page == 'now-playing' %}active{% endif %}">Films en salle</a>
+            <a href="{{ url_for('popular') }}" class="nav-link {% if active_page == 'popular' %}active{% endif %}">Films populaires</a>
+        </div>
+        
+        <form action="{{ url_for('search') }}" method="get" class="search-form">
+            <input type="text" name="query" placeholder="Rechercher un film..." value="{{ query if query is defined else '' }}">
+            <button type="submit">Rechercher</button>
+        </form>
+    </div>
+</nav>

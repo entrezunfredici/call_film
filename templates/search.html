@@ -1,0 +1,68 @@
+<!-- templates/search.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche de films</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <header class="page-header">
+        <h1>Recherche de films</h1>
+        
+        <div class="search-container">
+            <form action="{{ url_for('search') }}" method="get" class="main-search-form">
+                <input type="text" name="query" placeholder="Entrez le nom d'un film..." value="{{ query }}">
+                <button type="submit">Rechercher</button>
+            </form>
+        </div>
+        
+        {% if query %}
+        <div class="filter-container">
+            <form action="{{ url_for('search') }}" method="get" id="genre-form">
+                <input type="hidden" name="query" value="{{ query }}">
+                
+                <label for="genre">Filtrer par genre:</label>
+                <select name="genre" id="genre" onchange="this.form.submit()">
+                    <option value="">Tous les genres</option>
+                    {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if selected_genre == genre.id %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        {% endif %}
+    </header>
+    
+    <main class="movie-grid">
+        {% if movies %}
+            {% for movie in movies %}
+            <div class="movie-card">
+                <div class="movie-poster">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
+                </div>
+                <div class="movie-info">
+                    <h2>{{ movie.title }}</h2>
+                    <p class="release-date">Date de sortie: {{ movie.release_date }}</p>
+                    <p class="rating">Note: {{ movie.vote_average }}/10</p>
+                    <p class="overview">{{ movie.overview|truncate(150) }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% elif query %}
+            <p class="no-results">Aucun film trouvé pour "{{ query }}".</p>
+        {% else %}
+            <p class="no-results">Entrez un terme de recherche pour trouver des films.</p>
+        {% endif %}
+    </main>
+    
+    <footer>
+        <p>Données fournies par TMDB</p>
+    </footer>
+</body>
+</html>

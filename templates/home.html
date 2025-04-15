@@ -1,0 +1,37 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinéma Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Bienvenue sur Cinéma Explorer</h1>
+            <p>Découvrez les films actuellement en salle et les plus populaires</p>
+            
+            <div class="button-container">
+                <a href="{{ url_for('now_playing') }}" class="hero-button">Films en salle</a>
+                <a href="{{ url_for('popular') }}" class="hero-button">Films populaires</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Données fournies par TMDB</p>
+    </footer>
+
+    <script>
+        // Script pour animer l'apparition des éléments de la page d'accueil
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroContent = document.querySelector('.hero-content');
+            heroContent.classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>
