@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 from .genre import Genre
 
 movie_genres = db.Table('movie_genres',

@@ -1,7 +1,8 @@
 import os
 import requests
 from flask import Blueprint, jsonify
-from app.models import db, Movie
+from app.extensions import db
+from app.models.movie import Movie
 from dotenv import load_dotenv
 
 load_dotenv()

@@ -1,6 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.domain.tmdb_service import fetch_popular_movies
-from app.models import db, Movie
+from app.extensions import db
+from app.models.movie import Movie
 from flask import Flask
 import os
 
